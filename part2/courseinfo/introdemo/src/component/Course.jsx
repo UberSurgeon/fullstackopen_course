@@ -31,7 +31,7 @@ const Part = ({part}) => (
 const ListHandler = ({courses}) => {
     let lelist = []
     for (let i=0; i < courses.length; i++) {
-        lelist.push(<Constructor idx={i} courses={courses}/>)
+        lelist = lelist.concat(<div key={i+1}><Constructor idx={i} courses={courses}/></div>)
     }
     // console.log(lelist)
     // console.log("work")
@@ -44,11 +44,11 @@ const ListHandler = ({courses}) => {
 
 const Constructor = ({idx, courses}) => {
     return(
-        <div>
+        <>
             <Header course={courses[idx].name} />
             <Content parts={courses[idx].parts} />
             <Total exercises={courses[idx].parts} />
-        </div>
+        </>
     )
 }
 
