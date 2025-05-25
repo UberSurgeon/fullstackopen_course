@@ -64,14 +64,38 @@ const Persons = ({showALL, persons, OnDelete}) => {
 
 }
 
+const Notification = ({message, color}) => {
+  const messageStyle = {
+    color: color,
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+  
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div style={messageStyle}>
+      {message}
+    </div>
+  )
+}
+
 
 
 
 const App = () => {
-  const [persons, setPersons] = useState([]) 
+  const [persons, setPersons] = useState(null) 
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [showALL, setNewShowAll]= useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [notiColor, setNotiColor] = useState(null)
 
   useEffect(()=> {
     service
@@ -80,6 +104,10 @@ const App = () => {
         setPersons(initialNotes)
       })
   }, [])
+
+  if (!persons){
+    return null
+  }
 
   const addPb = (event) => {
     event.preventDefault()
@@ -94,7 +122,14 @@ const App = () => {
             console.log('UPDATE', match)
             setNewName('')
             setNewPhone('')
+          }).catch(error => {
+            setErrorMessage(`Information of ${newName} has already been removed from server`)
+            setNotiColor('red')
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
+          
       } else {
         alert(`${newName} is already added to phonebook`)
       }
@@ -104,6 +139,11 @@ const App = () => {
         .create(newPerson)
         .then(returnedNote => {
           setPersons(persons.concat(returnedNote))
+          setErrorMessage(`Added ${newName}`)
+          setNotiColor('green')
+          setTimeout(() => {
+              setErrorMessage(null)
+          }, 5000)
           setNewName('')
           setNewPhone('')
         })
@@ -148,6 +188,7 @@ const App = () => {
   return (
     <div>
     <h2>Phonebook</h2>
+    <Notification message={errorMessage} color={notiColor} />
     <Filter showAll={showALL} handleFilter={handleFilter}/>
 
     <h3>Add a new</h3>
