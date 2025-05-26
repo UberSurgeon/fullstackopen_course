@@ -15,6 +15,7 @@ const RenderWeatherIcon = ({weather}) => {
     case 231:
     case 232:
       x = `11d`; // thunderstorm
+      break
     case 300:
     case 301:
     case 302:
@@ -25,6 +26,7 @@ const RenderWeatherIcon = ({weather}) => {
     case 314:
     case 321:
       x = `09d`; // drizzle
+      break
     case 500:
     case 501:
     case 502:
@@ -35,6 +37,7 @@ const RenderWeatherIcon = ({weather}) => {
     case 522:
     case 531:
       x = `10d`; // rain
+      break
     case 600:
     case 601:
     case 602:
@@ -47,6 +50,7 @@ const RenderWeatherIcon = ({weather}) => {
     case 621:
     case 622:
       x = `13d`; // snow
+      break
     case 701:
     case 711:
     case 721:
@@ -58,22 +62,31 @@ const RenderWeatherIcon = ({weather}) => {
     case 771:
     case 781:
       x = `50d`; // mist/fog/smoke/dust
+      break
     case 800:
       x = `01d`; // clear sky
+      break
     case 801:
       x = `02d`; // few clouds
+      break
     case 802:
       x = `03d`; // scattered clouds
+      break
     case 803:
       x = `04d`; // broken clouds
+      break
     case 804:
       x = `04d`; // overcast clouds
+      break
     default:
       x = `01d`; // Default to clear sky icon
+      
   }
 
   const url = `https://openweathermap.org/img/wn/${x}@2x.png`
-
+  // console.log("WEATHER",weather)
+  // console.log("X",x)
+  // console.log("IMGURL",url)
   return (
     <>
       <img src={url}></img>
@@ -118,7 +131,7 @@ const HandleCountry = ({name, capital, area, language, flag, temp, wind, weather
       <h1>Weather in {capital}</h1>
       <p>Temperature {temp} Celsius</p>
       <RenderWeatherIcon weather={weather}/>
-      <p>Wind {wind} Celsius</p>
+      <p>Wind {wind} m/s</p>
 
     </>
   )
@@ -167,6 +180,7 @@ function App() {
       .then(geo => {       
         console.log("GEO",geo)
         const newObject = {'lat': geo[0].lat, 'lon': geo[0].lon}
+        // const newObject = {'lat': 33.5206824, 'lon': -86.8024326}
         console.log("CORD",newObject)
         setCord(newObject)
 
