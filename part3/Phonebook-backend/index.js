@@ -1,11 +1,20 @@
 import express, {request, response} from "express"
+import dotenv from 'dotenv'
 import morgan from "morgan"
+import Person from "./models/person.js"
+import mongoose from "mongoose"
 const app = express()
 app.use(express.json())
 morgan.token('content', function (req, res) { 
     return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
+
+dotenv.config()
+
+Person.find({}).then(persons =>{
+    console.log(persons)
+})
 
 let persons = [
     { 
@@ -33,11 +42,13 @@ let persons = [
 app.use(express.static('dist'))
 
 app.get('/api/persons', (request, response) => {
-    response.send(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/info', (request, response) => {
-    const count = persons.length
+    const count = Person.length
     const currentTime = new Date()
     response.send(`
             <p>Phonebook has info for ${count} people</p>
@@ -46,13 +57,9 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) =>{
-    const id = request.params.id
-    const person = persons.find(person => person.id === id)
-    if (person){
-        response.send(person)
-    } else {
-        response.status(400).end()
-    }
+    Person.findById(request.params.id).then(note => {
+        response.json(note)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -84,16 +91,16 @@ app.post('/api/persons', (request, response)=>{
         })
     }
 
-    const person = {
-        id: generateId(),
+    const person = new Person ({
         name: body.name,
         number: body.number
-    }
+    })
 
-    persons = persons.concat(person)
-    // console.log('post')
-    // console.log(person)
-    response.json(person)
+    person.save().then(savedPerson => {
+        console.log(person)
+        response.json(person)
+    })
+
 })
 
 
@@ -103,6 +110,6 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
