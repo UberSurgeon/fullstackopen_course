@@ -12,9 +12,10 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :c
 
 dotenv.config()
 
-Person.find({}).then(persons =>{
-    console.log(persons)
-})
+// Person.find({}).then(persons =>{
+//     console.log(persons)
+// })
+
 
 let persons = [
     { 
@@ -47,8 +48,8 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/info', (request, response) => {
-    const count = Person.length
+app.get('/info', async(request, response) => {
+    const count = await Person.countDocuments()
     const currentTime = new Date()
     response.send(`
             <p>Phonebook has info for ${count} people</p>
@@ -63,17 +64,45 @@ app.get('/api/persons/:id', (request, response) =>{
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end()
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
-const generateId = () => {
-    return Math.floor(Math.random() * 10001)
+const puttingfunc = (Person, id, name, number, next, response) => {
+    Person.findById(id)
+    .then(person => {
+        if (!person){
+            response.status(400).end()
+        }
+
+        person.name = name
+        person.number = number
+
+        return person.save().then((updatedPerson) => {
+            console.log(updatedPerson)
+            response.json(updatedPerson)
+        })
+    })
+    .catch(error => next(error))
 }
 
-app.post('/api/persons', (request, response)=>{
+app.put('/api/persons/:id', (request, response, next) => {
+    const {name, number} = request.body
+    // console.log("BUFFER", content, important)
+    puttingfunc(Person, request.params.id, name, number, next, response)
+
+})
+
+// const generateId = () => {
+//     return Math.floor(Math.random() * 10001)
+// }
+
+
+
+app.post('/api/persons', (request, response, next)=>{
     const body = request.body
     if(!body.name){
         return response.status(400).json({
@@ -85,20 +114,31 @@ app.post('/api/persons', (request, response)=>{
         })
     }
 
-    if (persons.some(person => person.name === body.name)){
-        return response.status(400).json({
-        error: 'name must be unique'
-        })
-    }
+    Person.find({name: body.name})
+        .then(result => {
+            console.log(result)
+            if (result.length > 0){
+                console.log("IDENTICAL")
+                console.log("FROM post")
+                const id = result[0]._id.toString()
+                console.log("ID", id)
+                const {name, number} = request.body
+                puttingfunc(Person, id, name, number, next, response)
+                return response.status(200).end()
+        //         return response.status(404).end()
+            } else {
+                //console.log("UNINDENTICAL")
+                const person = new Person ({
+                    name: body.name,
+                    number: body.number
+                })
 
-    const person = new Person ({
-        name: body.name,
-        number: body.number
-    })
-
-    person.save().then(savedPerson => {
-        console.log(person)
-        response.json(person)
+                person.save().then(savedPerson => {
+                    console.log(person)
+                    response.json(person)
+                })
+                return response.status(200).end()
+            }
     })
 
 })
@@ -108,8 +148,20 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
+const errorHandle = (error, request, response, next) => {
+    console.log(error.message)
+
+    if (error.name === 'CastError'){
+        return response.status(400).send({ error: 'malformatted id'})
+    }
+
+    next(error)
+}
+
 app.use(unknownEndpoint)
+app.use(errorHandle)
 
 const PORT = process.env.PORT
 app.listen(PORT)
+
 console.log(`Server running on port ${PORT}`)
