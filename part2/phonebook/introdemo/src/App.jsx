@@ -138,14 +138,22 @@ const App = () => {
       service
         .create(newPerson)
         .then(returnedNote => {
-          setPersons(persons.concat(returnedNote))
-          setErrorMessage(`Added ${newName}`)
-          setNotiColor('green')
-          setTimeout(() => {
-              setErrorMessage(null)
-          }, 5000)
-          setNewName('')
-          setNewPhone('')
+          console.log(returnedNote)
+          if(returnedNote.error){
+            setNotiColor('red')
+            setErrorMessage(returnedNote.error)
+          } else{
+            setPersons(persons.concat(returnedNote))
+            setErrorMessage(`Added ${newName}`)
+            setNotiColor('green')
+            setTimeout(() => {
+                setErrorMessage(null)
+            }, 5000)
+            setNewName('')
+            setNewPhone('')}
+        })
+        .catch(error => {
+          console.log(error)
         })
     }
   }
