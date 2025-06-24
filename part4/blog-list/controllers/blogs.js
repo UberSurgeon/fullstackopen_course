@@ -56,11 +56,10 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, n
 blogsRouter.put('/:id', async(request, response, next) => {
     const likes = request.body.likes
     const blog = await Blog.findById(request.params.id)
-
+    console.log(request.params.id)
     if (!likes) {
         return response.status(404).end()
     }
-
     blog.likes = likes
 
     const savedBlog = await blog.save()

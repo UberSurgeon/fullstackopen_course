@@ -27,15 +27,17 @@ const errorHandler = (error, request, response, next) => {
             .status(400)
             .json({ error: 'expect `username` to be unique' })
     } else if (error.name === 'JsonWebTokenError') {
-        return response.status(400).json({ error: 'token invalid' })
+        return response.status(401).json({ error: 'token invalid' })
     } else if (error.name === 'TokenExpiredError') {
         return response.status(401).json({ error: 'token expired' })
+
     }
     next(error)
 }
 
 
 const userExtractor = async (request, response, next) => {
+    try{
     const authorization = request.get('authorization')
     console.log("AUTH", authorization)
     if(authorization && authorization.startsWith('Bearer ')){
@@ -57,6 +59,9 @@ const userExtractor = async (request, response, next) => {
         response.status(401)
     }
     next()
+    }catch(error){
+        next(error)
+    }
 }
 
 export default {requestLogger, unknownEndpoint, errorHandler, userExtractor}
