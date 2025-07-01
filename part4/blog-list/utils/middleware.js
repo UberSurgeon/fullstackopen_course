@@ -44,20 +44,21 @@ const userExtractor = async (request, response, next) => {
         request.token = authorization.replace('Bearer ', '')
         const decodedToken = jwt.verify(request.token, config.SECRET)
         if(!decodedToken.id){
-            response.status(401).send({ error: 'token invalid' })
+            return response.status(401).send({ error: 'token invalid' })
         }
 
         const user = await User.findById(decodedToken.id)
 
         if (!user) {
-            response.status(400).send({ error: 'UserId missing or not valid' })
+            return response.status(400).send({ error: 'UserId missing or not valid' })
         }
         request.user = user
     }
     else{
         request.token = null
-        response.status(401)
+        return response.status(401)
     }
+
     next()
     }catch(error){
         next(error)

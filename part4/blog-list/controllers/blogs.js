@@ -20,25 +20,26 @@ blogsRouter.post('/',middleware.userExtractor , async (request, response) => {
 
     if (!user) {
         return response.status(400).json({ error: 'UserId missing or not valid' })
+    } else {
+        console.log(user.name)
+
+        const blog = new Blog({
+            title: body.title,
+            author: body.author,
+            url: body.url,
+            likes: body.likes || 0,
+            users: user._id
+        })
+
+        if (!blog.title || !blog.url){
+            return response.status(400).end()
+        } else{
+            const savedBlog = await blog.save()
+            user.blogs = await user.blogs.concat(savedBlog._id)
+            await user.save()
+            response.status(201).json(savedBlog)
+        }
     }
-    console.log(user.name)
-
-    const blog = new Blog({
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes || 0,
-        users: user._id
-    })
-
-    if (!blog.title || !blog.url){
-        return response.status(400).end()
-    }
-
-    const savedBlog = await blog.save()
-    user.blogs = await user.blogs.concat(savedBlog._id)
-    await user.save()
-    response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, next) => {
