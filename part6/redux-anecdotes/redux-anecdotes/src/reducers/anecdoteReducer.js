@@ -1,3 +1,5 @@
+import { createSlice, current } from "@reduxjs/toolkit"
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -19,13 +21,44 @@ const asObject = (anecdote) => {
 
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+// const reducer = (state = initialState, action) => {
+//   console.log('state now: ', state)
+//   console.log('action', action)
 
-  switch(action.type) {
-    case 'VOTE': {
-      const id = action.payload.id
+//   switch(action.type) {
+//     case 'VOTE': {
+//       const id = action.payload.id
+//       const anecToChange = state.find( n => n.id === id)
+//       const changedAnec = {
+//         ...anecToChange,
+//         votes: anecToChange.votes + 1
+//       }
+
+//       return state.map(anec => anec.id !== id ? anec: changedAnec)
+//     }
+//     case 'NEW_ANEC': {
+//       return [...state, action.payload]
+//     }
+//     default:
+//       return state
+//   }
+// }
+
+const anecSlice = createSlice({
+  name: 'anec',
+  initialState,
+  reducers: {
+    createAnec(state, action) {
+      const content = action.payload
+      state.push({
+        content,
+        id: getId(),
+        votes: 0
+      })
+    },
+    addVoteOf(state, action) {
+
+      const id = action.payload
       const anecToChange = state.find( n => n.id === id)
       const changedAnec = {
         ...anecToChange,
@@ -34,30 +67,27 @@ const reducer = (state = initialState, action) => {
 
       return state.map(anec => anec.id !== id ? anec: changedAnec)
     }
-    case 'NEW_ANEC': {
-      return [...state, action.payload]
-    }
-    default:
-      return state
   }
-}
+})
 
-export const addVoteOf = (id) => {
-  return{
-    type: 'VOTE',
-    payload: { id }
-  }
-}
 
-export const createAnec = (content) => {
-  return {
-    type: 'NEW_ANEC',
-    payload: {
-      content,
-      id: getId(),
-      votes: 0
-    }
-  }
-}
+// export const addVoteOf = (id) => {
+//   return{
+//     type: 'VOTE',
+//     payload: { id }
+//   }
+// }
 
-export default reducer
+// export const createAnec = (content) => {
+//   return {
+//     type: 'NEW_ANEC',
+//     payload: {
+//       content,
+//       id: getId(),
+//       votes: 0
+//     }
+//   }
+// }
+
+export const { createAnec, addVoteOf } = anecSlice.actions
+export default anecSlice.reducer
