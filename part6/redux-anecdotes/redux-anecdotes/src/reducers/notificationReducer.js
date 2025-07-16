@@ -9,18 +9,24 @@ const notiSlice = createSlice({
     reducers: {
         setNoti(state, action) {
             console.log(`You voted '${action.payload}'`)
-            state = `You voted '${action.payload}'`
             return `You voted '${action.payload}'`
         },
 
         clearNoti(state, action){
             console.log(`CLEAR`)
-            state = ''
             return null
         }
     }
 })
 
-export const { setNoti, clearNoti } = notiSlice.actions
 
+export const { setNoti, clearNoti } = notiSlice.actions
+    // dispatch(setNoti(content))
+    // setTimeout(() => dispatch(clearNoti()), 5000)
+export const setNotification = (content, time)=> {
+    return async dispatch => {
+        dispatch(setNoti(content))
+        setTimeout(() => dispatch(clearNoti()), time * 1000)
+    }
+}
 export default notiSlice.reducer

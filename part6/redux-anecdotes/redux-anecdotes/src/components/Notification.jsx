@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux"
-import { useState } from "react"
 
 const Notification = () => {
   const notification = useSelector(({noti}) => {
