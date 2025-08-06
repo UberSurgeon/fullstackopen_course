@@ -23,7 +23,7 @@ const NewBook = (props) => {
     console.log('add book...')
 
     setTitle('')
-    setPublished()
+    setPublished('')
     setAuthor('')
     setGenres([])
     setGenre('')

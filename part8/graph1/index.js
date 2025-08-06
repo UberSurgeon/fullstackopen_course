@@ -126,7 +126,7 @@ const typeDefs = `
   type Book {
     title: String
     author: String
-    published: Author
+    published: Int
     genres: [String!]!
     id: ID
   }
@@ -252,6 +252,10 @@ const resolvers = {
         born: a.born,
         bookCount: books.filter(b => b.author == a.name).length
       }))
+    },
+
+    me: async (root, args, {currentUser}) => {
+      return currentUser
     }
   },
 
