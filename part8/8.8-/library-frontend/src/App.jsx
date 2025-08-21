@@ -6,7 +6,8 @@ import Recommend from "./components/Recommend";
 import { Link, Routes, Route} from 'react-router-dom'
 import { useState } from "react";
 import LoginForm from "./components/login";
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { BOOK_ADDED } from "./query/query";
 
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem('logged-in-usertoken') ? localStorage.getItem('logged-in-usertoken') : null)
@@ -15,6 +16,11 @@ const App = () => {
     paddingRight: 5
   }
 
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      window.alert(data.data.addBook.title)
+    }
+  })
 
   if (!token) {
     return <LoginForm setToken={setToken}/>

@@ -1,6 +1,8 @@
 import { useQuery } from "@apollo/client"
 import { ALL_BOOKS, ALL_BOOKS_GENRES } from "../query/query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSubscription } from "@apollo/client"
+import { BOOK_ADDED } from "../query/query"
 
 const Books = (props) => {
   // if (!props.show) {
@@ -8,7 +10,15 @@ const Books = (props) => {
   // }
   const [genre, setGenre] = useState(null)
 
-  const result = useQuery(ALL_BOOKS_GENRES, {variables: {genre} })
+
+
+  const result = useQuery(ALL_BOOKS_GENRES, {variables: {genre}})
+
+  useSubscription(BOOK_ADDED, {
+      onData: ({ data }) => {
+        result.refetch({variables: {genre}})
+      }
+    })
   
   if (result.loading) {
     return <div>loading...</div>

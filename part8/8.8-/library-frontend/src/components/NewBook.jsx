@@ -5,7 +5,7 @@ import { useState } from 'react'
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
-  const [published, setPublished] = useState()
+  const [published, setPublished] = useState(0)
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBooks] = useMutation(ADD_BOOK, {refetchQueries: [{query: ALL_BOOKS}, {query: ALL_AUTHORS}], 
