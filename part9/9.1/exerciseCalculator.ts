@@ -8,8 +8,6 @@ interface TargetValue{
     ratingDescription: string
 }
 
-const dailyHour = [3, 0, 2, 4.5, 0, 3, 1]
-
 const calculateExercises = (dailyHour: number[], targetAmount: number): TargetValue => {
     const sum = dailyHour.reduce((p,c) => p + c, 0);
     const avg = sum / dailyHour.length;
@@ -17,13 +15,13 @@ const calculateExercises = (dailyHour: number[], targetAmount: number): TargetVa
     let ratingDescription: string;
     if (avg >= targetAmount){
         rating = 3;
-        ratingDescription = "perfect"
+        ratingDescription = "perfect";
     } else if (avg >= targetAmount-0.5){
         rating = 2;
-        ratingDescription = "not too bad but could be better"
+        ratingDescription = "not too bad but could be better";
     } else {
         rating = 1;
-        ratingDescription = "bad"
+        ratingDescription = "bad";
     }
 
     return {
@@ -34,12 +32,17 @@ const calculateExercises = (dailyHour: number[], targetAmount: number): TargetVa
         ratingDescription,
         target: targetAmount,
         average: avg
-    }
+    };
 
+};
+
+
+if(require.main === module){
+    const input = process.argv.map((n: string) => Number(n)).filter(Number.isFinite);
+    const target = input.splice(0, 1);
+
+
+    console.log(calculateExercises(input, target[0]));
 }
 
-let input = process.argv.map((n: any) => Number(n)).filter(Number.isFinite)
-let target = input.splice(0, 1)
-
-
-console.log(calculateExercises(input, target[0]));
+export default calculateExercises;
